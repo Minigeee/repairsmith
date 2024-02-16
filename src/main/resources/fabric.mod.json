@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "repairsmith",
+	"version": "${version}",
+	"name": "Repairable Gear",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/repairsmith/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"minigee.repairsmith.Repairsmith"
+		],
+		"client": [
+			"minigee.repairsmith.RepairsmithClient"
+		],
+		"fabric-datagen": [
+			"minigee.repairsmith.RepairsmithDataGenerator"
+		]
+	},
+	"mixins": [
+		"repairsmith.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.6",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

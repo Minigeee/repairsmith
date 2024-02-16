@@ -1,0 +1,11 @@
+{
+	"entity.minecraft.villager.repairsmith": "Repairsmith",
+
+	"text.repairsmith.cost": "Cost",
+	"text.repairsmith.repair": "Repair",
+	"text.repairsmith.repair_items": "Repair Items",
+
+	"text.repairsmith.no_items": "No damaged items to repair",
+	"text.repairsmith.not_affordable": "Can not afford",
+	"text.repairsmith.no_more_offers": "Out of repair trades"
+}

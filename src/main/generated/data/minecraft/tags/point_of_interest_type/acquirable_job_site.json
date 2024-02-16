@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "repairsmith:repairsmith_poi",
+      "required": false
+    }
+  ]
+}
