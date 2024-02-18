@@ -5,9 +5,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import net.fabric_extras.structure_pool.api.StructurePoolConfig;
 
 public record Config(
 		/** The amount of durability that 1 emerald can repair */
@@ -22,6 +27,9 @@ public record Config(
 		int durabilityPerVillagerXp,
 		/** The exponent value that gets applied to xp reward values */
 		float xpExp) {
+
+	/** Village structures config */
+	public static final StructurePoolConfig STRUCTURES = new StructurePoolConfig();
 
 	/** Config file path */
 	public static final String CONFIG_PATH = "config" + File.separator + Repairsmith.MOD_ID + ".json";
@@ -50,6 +58,25 @@ public record Config(
 				writer.flush();
 				writer.close();
 			}
+
+			int weight = 10;
+			int limit = 2;
+			STRUCTURES.entries = new ArrayList<>(List.of(
+					new StructurePoolConfig.Entry("minecraft:village/desert/houses", new ArrayList<>(Arrays.asList(
+							new StructurePoolConfig.Entry.Structure("repairsmith:village/desert/desert_repairsmith",
+									weight, limit)))),
+					new StructurePoolConfig.Entry("minecraft:village/plains/houses", new ArrayList<>(Arrays.asList(
+							new StructurePoolConfig.Entry.Structure("repairsmith:village/plains/plains_repairsmith",
+									weight, limit)))),
+					new StructurePoolConfig.Entry("minecraft:village/savanna/houses", new ArrayList<>(Arrays.asList(
+							new StructurePoolConfig.Entry.Structure("repairsmith:village/savanna/savanna_repairsmith",
+									weight, limit)))),
+					new StructurePoolConfig.Entry("minecraft:village/snowy/houses", new ArrayList<>(Arrays.asList(
+							new StructurePoolConfig.Entry.Structure("repairsmith:village/snowy/snowy_repairsmith",
+									weight, limit)))),
+					new StructurePoolConfig.Entry("minecraft:village/taiga/houses", new ArrayList<>(Arrays.asList(
+							new StructurePoolConfig.Entry.Structure("repairsmith:village/taiga/taiga_repairsmith",
+									weight, limit))))));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

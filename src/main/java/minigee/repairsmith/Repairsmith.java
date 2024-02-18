@@ -1,5 +1,7 @@
 package minigee.repairsmith;
 
+import net.fabric_extras.structure_pool.api.StructurePoolAPI;
+import net.fabric_extras.structure_pool.api.StructurePoolConfig;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.trade.TradeOfferHelper;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
@@ -40,6 +42,7 @@ public class Repairsmith implements ModInitializer {
 			entry -> entry.matchesKey(REPAIRSMITH_POI_KEY), entry -> entry.matchesKey(REPAIRSMITH_POI_KEY),
 			ImmutableSet.of(), ImmutableSet.of(), SoundEvents.ENTITY_VILLAGER_WORK_TOOLSMITH);
 
+	/** Screen handler */
 	public static final ScreenHandlerType<RepairScreenHandler> REPAIR_SCREEN_HANDLER = new ScreenHandlerType<>(
 			RepairScreenHandler::new, FeatureFlags.DEFAULT_ENABLED_FEATURES);
 
@@ -47,6 +50,9 @@ public class Repairsmith implements ModInitializer {
 	public void onInitialize() {
 		// Load config
 		Config.setup();
+
+		// Structures
+		StructurePoolAPI.injectAll(Config.STRUCTURES);
 
 		// Villager
 		PointOfInterestHelper.register(new Identifier(MOD_ID, "repairsmith_poi"), 1, 1, Blocks.ANVIL,
@@ -58,7 +64,8 @@ public class Repairsmith implements ModInitializer {
 
 		// Dummy offer so that repairsmith has something to offer
 		TradeOfferHelper.registerVillagerOffers(REPAIRSMITH, 1, (factories) -> {
-			factories.add((entity, random) -> new TradeOffer(new ItemStack(Blocks.STONE, 100), new ItemStack(Blocks.STONE, 100),
+			factories.add((entity, random) -> new TradeOffer(new ItemStack(Blocks.STONE, 100),
+					new ItemStack(Blocks.STONE, 100),
 					CONFIG.maxOffers(), 1, 0.1f));
 		});
 
