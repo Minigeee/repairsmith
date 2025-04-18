@@ -28,7 +28,7 @@ public class RepairsmithDataGenerator implements DataGeneratorEntrypoint {
 		@Override
 		protected void configure(WrapperLookup var1) {
 			this.getOrCreateTagBuilder(PointOfInterestTypeTags.ACQUIRABLE_JOB_SITE)
-					.addOptional(new Identifier(Repairsmith.MOD_ID, "repairsmith_poi"));
+				.addOptional(Identifier.of(Repairsmith.MOD_ID, "repairsmith_poi"));
 		}
 
 	}

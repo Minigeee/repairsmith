@@ -1,8 +1,11 @@
 package minigee.repairsmith.util;
 
 import minigee.repairsmith.Repairsmith;
+import minigee.repairsmith.network.RepairItemsPacketPayload;
+import minigee.repairsmith.network.SyncTradeOffersPayload;
 import minigee.repairsmith.screen.RepairScreenHandler;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.network.PacketByteBuf;
@@ -13,27 +16,34 @@ import net.minecraft.village.TradeOfferList;
 
 public class NetworkUtil {
 
-	public static final Identifier SYNC_TRADE_OFFERS = new Identifier(Repairsmith.MOD_ID, "sync_trade_offers");
-	public static final Identifier REPAIR_ITEMS_PACKET = new Identifier(Repairsmith.MOD_ID, "repair_items");
+	public static final Identifier SYNC_TRADE_OFFERS = Identifier.of(Repairsmith.MOD_ID, "sync_trade_offers");
+	public static final Identifier REPAIR_ITEMS_PACKET = Identifier.of(Repairsmith.MOD_ID, "repair_items");
 
 	public static void init() {
 
-		// Repair items action
-		ServerPlayNetworking.registerGlobalReceiver(REPAIR_ITEMS_PACKET,
-				(server, player, handler, buf, responseSender) -> {
-					int syncId = buf.readVarInt();
-					ScreenHandler screenHandler = player.currentScreenHandler;
+		PayloadTypeRegistry.playS2C().register(SyncTradeOffersPayload.ID, SyncTradeOffersPayload.CODEC);
+		PayloadTypeRegistry.playC2S().register(RepairItemsPacketPayload.ID, RepairItemsPacketPayload.CODEC);
 
-					if (syncId == screenHandler.syncId && screenHandler instanceof RepairScreenHandler) {
-						// Repair items
-						RepairScreenHandler repairScreenHandler = (RepairScreenHandler) screenHandler;
-						repairScreenHandler.repairAll();
 
-						// Sync new trade offers
-						VillagerEntity villager = (VillagerEntity)repairScreenHandler.merchant;
-						NetworkUtil.syncTradeOffers(player, syncId, villager.getOffers(), villager.getVillagerData().getLevel());
-					}
-				});
+		ServerPlayNetworking.registerGlobalReceiver(RepairItemsPacketPayload.ID, (payload, context) -> {
+			context.server().execute(() -> {
+				ServerPlayerEntity player = context.player();
+				ScreenHandler screenHandler = context.player().currentScreenHandler;
+				int syncId = payload.syncId();
+				if (syncId == screenHandler.syncId && screenHandler instanceof RepairScreenHandler) {
+					// Repair items
+					RepairScreenHandler repairScreenHandler = (RepairScreenHandler) screenHandler;
+					repairScreenHandler.repairAll();
+
+					// Sync new trade offers
+					VillagerEntity villager = (VillagerEntity)repairScreenHandler.merchant;
+
+					// Prepare the payload
+					SyncTradeOffersPayload SyncTradeOffersPayload = new SyncTradeOffersPayload(villager.getOffers(), syncId, villager.getVillagerData().getLevel());
+					ServerPlayNetworking.send(context.player(), SyncTradeOffersPayload);
+				}
+			});
+		});
 	}
 
 	/**
@@ -46,14 +56,9 @@ public class NetworkUtil {
 	 * @param level The villager level
 	 */
 	public static void syncTradeOffers(ServerPlayerEntity player, int syncId, TradeOfferList offers, int level) {
-		// Create packet
-		PacketByteBuf buf = PacketByteBufs.create();
-		buf.writeVarInt(syncId);
-		offers.toPacket(buf);
-		buf.writeInt(level);
-
+		SyncTradeOffersPayload SyncTradeOffersPayload = new SyncTradeOffersPayload(offers, syncId, level);
 		// Send message
-		ServerPlayNetworking.send(player, NetworkUtil.SYNC_TRADE_OFFERS, buf);
+		ServerPlayNetworking.send(player, SyncTradeOffersPayload);
 	}
 
 }
