@@ -10,7 +10,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 
-public record SyncTradeOffersPayload(TradeOfferList tradeOfferList, int syncId, int level) implements CustomPayload {
+public record SyncTradeOffersPayload(TradeOfferList tradeOfferList, int syncId) implements CustomPayload {
     public static final CustomPayload.Id<SyncTradeOffersPayload> ID = new CustomPayload.Id<>(NetworkUtil.SYNC_TRADE_OFFERS);
     //public static final PacketCodec<RegistryByteBuf, SyncTradeOffersPayload> CODEC = PacketCodec.tuple(TradeOfferList.PACKET_CODEC, SyncTradeOffersPayload::tradeOfferList, SyncTradeOffersPayload::new);
     // should you need to send more data, add the appropriate record parameters and change your codec:
@@ -18,7 +18,6 @@ public record SyncTradeOffersPayload(TradeOfferList tradeOfferList, int syncId, 
         TradeOfferList.PACKET_CODEC,
         SyncTradeOffersPayload::tradeOfferList,
         PacketCodecs.INTEGER, SyncTradeOffersPayload::syncId,
-        PacketCodecs.INTEGER, SyncTradeOffersPayload::level,
         SyncTradeOffersPayload::new
     );
 

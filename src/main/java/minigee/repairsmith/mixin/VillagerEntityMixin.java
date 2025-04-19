@@ -32,20 +32,6 @@ import minigee.repairsmith.util.NetworkUtil;
 
 @Mixin(VillagerEntity.class)
 public abstract class VillagerEntityMixin extends MerchantEntity {
-
-	@Shadow
-	@Nullable
-	private PlayerEntity lastCustomer;
-
-	@Shadow
-	private int experience;
-
-	@Shadow
-	private int levelUpTimer;
-
-	@Shadow
-	private boolean levelingUp;
-
 	@Shadow
 	@Final
 	public VillagerData getVillagerData() {
@@ -55,12 +41,6 @@ public abstract class VillagerEntityMixin extends MerchantEntity {
 	@Shadow
 	@Final
 	private void prepareOffersFor(PlayerEntity player) {
-	}
-
-	@Shadow
-	@Final
-	private boolean canLevelUp() {
-		return false;
 	}
 
 	public VillagerEntityMixin(EntityType<? extends MerchantEntity> entityType, World world) {
@@ -84,45 +64,16 @@ public abstract class VillagerEntityMixin extends MerchantEntity {
 			// Send trade offers (only 1 that contains uses, villager xp, price multiplier)
 			TradeOfferList tradeOfferList;
 			if (optionalInt.isPresent() && !(tradeOfferList = this.getOffers()).isEmpty()) {
-				NetworkUtil.syncTradeOffers((ServerPlayerEntity) customer, optionalInt.getAsInt(), tradeOfferList,
-						this.getVillagerData().getLevel());
+				NetworkUtil.syncTradeOffers((ServerPlayerEntity) customer, optionalInt.getAsInt(), tradeOfferList);
 			}
 
 			info.cancel();
 		}
 	}
 
-	/** Award custom xp if type is repairsmith */
 	@Inject(at = @At("HEAD"), method = "afterUsing", cancellable = true)
 	private void afterUsing(TradeOffer offer, CallbackInfo info) {
-		// Check if profession is repairsmith
 		if (this.getVillagerData().getProfession() == Repairsmith.REPAIRSMITH) {
-			this.lastCustomer = this.getCustomer();
-
-			// Get damage repaired
-			int damageRepaired = offer.getSpecialPrice();
-
-			// Villager xp
-			this.experience += (int) Math
-					.ceil(Math.pow((double) damageRepaired / Repairsmith.CONFIG.durabilityPerVillagerXp(),
-							Repairsmith.CONFIG.xpExp()));
-
-			// Player xp
-			int playerXp = (int) Math.ceil(
-					Math.pow((double) damageRepaired / Repairsmith.CONFIG.durabilityPerPlayerXp(),
-							Repairsmith.CONFIG.xpExp()));
-			if (this.canLevelUp()) {
-				this.levelUpTimer = 40;
-				this.levelingUp = true;
-				playerXp += 5;
-			}
-
-			if (offer.shouldRewardPlayerExperience()) {
-				this.getWorld().spawnEntity(
-						new ExperienceOrbEntity(this.getWorld(), this.getX(), this.getY() + 0.5, this.getZ(),
-								playerXp));
-			}
-
 			info.cancel();
 		}
 	}

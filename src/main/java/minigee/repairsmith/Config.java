@@ -16,17 +16,9 @@ import net.fabric_extras.structure_pool.api.StructurePoolConfig;
 
 public record Config(
 		/** The amount of durability that 1 emerald can repair */
-		int durabilityPerEmerald,
-		/** The exponent value that gets applied to the emerald cost */
-		float costExp,
+		int costPerDurability,
 		/** Max number of repair trade offers per cycle */
-		int maxOffers,
-		/** Amount of durability repair needed to reward 1 player xp */
-		int durabilityPerPlayerXp,
-		/** Amount of durability repair needed to reward 1 villager xp */
-		int durabilityPerVillagerXp,
-		/** The exponent value that gets applied to xp reward values */
-		float xpExp) {
+		int maxOffers) {
 
 	/** Village structures config */
 	public static final StructurePoolConfig STRUCTURES = new StructurePoolConfig();

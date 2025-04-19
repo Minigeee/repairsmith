@@ -33,7 +33,7 @@ public class Repairsmith implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	/** Config */
-	public static Config CONFIG = new Config(30, 0.7f, 5, 50, 20, 0.6f);
+	public static Config CONFIG = new Config(1, 5);
 
 	/** Poi registry key */
 	public static final RegistryKey<PointOfInterestType> REPAIRSMITH_POI_KEY = RegistryKey

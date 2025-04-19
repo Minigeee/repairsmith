@@ -1,21 +1,12 @@
 package minigee.repairsmith.util;
 
+import com.glisco.numismaticoverhaul.ModComponents;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Items;
 
 public class InventoryUtil {
 
 	public static boolean canAfford(PlayerInventory playerInventory, int cost) {
-		int budget = 0;
-		for (final var stack : playerInventory.offHand) {
-			if (stack.getItem() == Items.EMERALD)
-				budget += stack.getCount();
-		}
-		for (final var stack : playerInventory.main) {
-			if (stack.getItem() == Items.EMERALD)
-				budget += stack.getCount();
-		}
-
-		return budget >= cost;
+		return ModComponents.CURRENCY.get(playerInventory.player).getValue() >= cost;
 	}
 }

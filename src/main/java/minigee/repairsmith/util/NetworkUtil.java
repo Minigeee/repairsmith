@@ -39,7 +39,7 @@ public class NetworkUtil {
 					VillagerEntity villager = (VillagerEntity)repairScreenHandler.merchant;
 
 					// Prepare the payload
-					SyncTradeOffersPayload SyncTradeOffersPayload = new SyncTradeOffersPayload(villager.getOffers(), syncId, villager.getVillagerData().getLevel());
+					SyncTradeOffersPayload SyncTradeOffersPayload = new SyncTradeOffersPayload(villager.getOffers(), syncId);
 					ServerPlayNetworking.send(context.player(), SyncTradeOffersPayload);
 				}
 			});
@@ -53,10 +53,9 @@ public class NetworkUtil {
 	 * @param player The player to send to
 	 * @param syncId The sync id of the handled screen
 	 * @param offers The list of offers to sync
-	 * @param level The villager level
 	 */
-	public static void syncTradeOffers(ServerPlayerEntity player, int syncId, TradeOfferList offers, int level) {
-		SyncTradeOffersPayload SyncTradeOffersPayload = new SyncTradeOffersPayload(offers, syncId, level);
+	public static void syncTradeOffers(ServerPlayerEntity player, int syncId, TradeOfferList offers) {
+		SyncTradeOffersPayload SyncTradeOffersPayload = new SyncTradeOffersPayload(offers, syncId);
 		// Send message
 		ServerPlayNetworking.send(player, SyncTradeOffersPayload);
 	}

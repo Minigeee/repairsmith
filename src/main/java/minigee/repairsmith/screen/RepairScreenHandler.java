@@ -1,5 +1,6 @@
 package minigee.repairsmith.screen;
 
+import com.glisco.numismaticoverhaul.ModComponents;
 import minigee.repairsmith.Repairsmith;
 import minigee.repairsmith.util.InventoryUtil;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,8 +26,6 @@ public class RepairScreenHandler extends ScreenHandler {
 	public final SimpleInventory inventory;
 	private final PlayerInventory playerInv;
 
-	/** Villager level progress */
-	private int levelProgress = 0;
 	/** Cost of item repair in emeralds */
 	private int cost = 0;
 
@@ -53,8 +52,7 @@ public class RepairScreenHandler extends ScreenHandler {
 			for (int i = 0; i < inv.size(); ++i) {
 				final var stack = inv.getStack(i);
 
-				double cost = Math.pow((double) stack.getDamage() / Repairsmith.CONFIG.durabilityPerEmerald(),
-						Repairsmith.CONFIG.costExp());
+				double cost = (double) Repairsmith.CONFIG.costPerDurability() * stack.getDamage();
 				totalCost += (int) Math.ceil(cost * priceMultiplier);
 			}
 
@@ -120,14 +118,6 @@ public class RepairScreenHandler extends ScreenHandler {
 		this.dropInventory(player, this.inventory);
 	}
 
-	public int getLevelProgress() {
-		return this.levelProgress;
-	}
-
-	public void setLevelProgress(int levelProgress) {
-		this.levelProgress = levelProgress;
-	}
-
 	/** Used to sync trade offers */
 	public void setOffers(TradeOfferList offers) {
 		this.merchant.setOffersFromServer(offers);
@@ -168,28 +158,7 @@ public class RepairScreenHandler extends ScreenHandler {
 			stack.setDamage(0);
 		}
 
-		// Remove cost from player inventory
-		int remaining = this.cost;
-
-		for (final var stack : this.playerInv.offHand) {
-			if (remaining <= 0)
-				break;
-			if (stack.getItem() == Items.EMERALD) {
-				int remove = Math.min(stack.getCount(), remaining);
-				stack.decrement(remove);
-				remaining -= remove;
-			}
-		}
-
-		for (final var stack : this.playerInv.main) {
-			if (remaining <= 0)
-				break;
-			if (stack.getItem() == Items.EMERALD) {
-				int remove = Math.min(stack.getCount(), remaining);
-				stack.decrement(remove);
-				remaining -= remove;
-			}
-		}
+		ModComponents.CURRENCY.get(this.playerInv.player).modify(-this.cost);
 
 		// Play sound
 		this.playerInv.player.playSound(SoundEvents.BLOCK_ANVIL_USE);

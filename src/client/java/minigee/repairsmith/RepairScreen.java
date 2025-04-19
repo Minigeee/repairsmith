@@ -1,5 +1,6 @@
 package minigee.repairsmith;
 
+import com.glisco.numismaticoverhaul.item.NumismaticOverhaulItems;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import io.netty.buffer.Unpooled;
@@ -51,21 +52,6 @@ public class RepairScreen extends HandledScreen<RepairScreenHandler> {
 		int y = (height - backgroundHeight) / 2;
 		context.drawTexture(GUI_TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight);
 	}
-	
-    /* @Override
-    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
-		// Render title
-        int lvl = ((RepairScreenHandler)this.handler).getLevelProgress();
-        if (lvl > 0 && lvl <= 5) {
-            MutableText text = this.title.copy().append(SEPARATOR_TEXT).append(Text.translatable("merchant.level." + lvl));
-            int x = this.backgroundWidth / 2 - this.textRenderer.getWidth(text) / 2;
-            context.drawText(this.textRenderer, text, x, this.titleY, 0x404040, false);
-        } else {
-            context.drawText(this.textRenderer, this.title, this.backgroundWidth / 2 - this.textRenderer.getWidth(this.title) / 2, this.titleY, 0x404040, false);
-        }
-
-        context.drawText(this.textRenderer, this.playerInventoryTitle, this.playerInventoryTitleX, this.playerInventoryTitleY, 0x404040, false);
-	} */
 
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
@@ -87,10 +73,28 @@ public class RepairScreen extends HandledScreen<RepairScreenHandler> {
 		// Cost
 		int cost = this.handler.getRepairCost();
 		if (cost > 0) {
+			int goldCost = cost / 10000;
+			int silverCost = (cost % 10000) / 100;
+			int bronzeCost = cost % 100;
 			context.drawText(this.textRenderer, COST_TEXT, this.x + COST_X, this.y + COST_Y, 0x404040, false);
-			context.drawItem(new ItemStack(Items.EMERALD, cost), this.x + COST_X, this.y + COST_Y + 8);
-			context.drawItemInSlot(this.textRenderer, new ItemStack(Items.EMERALD, cost), this.x + COST_X,
-					this.y + COST_Y + 8);
+			int offset = 0;
+			if (goldCost > 0) {
+				ItemStack goldStack = new ItemStack(NumismaticOverhaulItems.GOLD_COIN, goldCost);
+				context.drawItem(goldStack, this.x + COST_X, this.y + COST_Y + 8);
+				context.drawItemInSlot(this.textRenderer, goldStack, this.x + COST_X,this.y + COST_Y + 8);
+				offset += 16;
+			}
+			if (silverCost > 0) {
+				ItemStack silverStack = new ItemStack(NumismaticOverhaulItems.SILVER_COIN, silverCost);
+				context.drawItem(silverStack, this.x + COST_X + offset, this.y + COST_Y + 8);
+				context.drawItemInSlot(this.textRenderer, silverStack, this.x + COST_X + offset,this.y + COST_Y + 8);
+				offset += 16;
+			}
+			if (bronzeCost > 0) {
+				ItemStack bronzeStack = new ItemStack(NumismaticOverhaulItems.BRONZE_COIN, bronzeCost);
+				context.drawItem(bronzeStack, this.x + COST_X + offset, this.y + COST_Y + 8);
+				context.drawItemInSlot(this.textRenderer, bronzeStack, this.x + COST_X + offset,this.y + COST_Y + 8);
+			}
 		}
 
 		drawMouseoverTooltip(context, mouseX, mouseY);
