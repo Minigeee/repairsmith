@@ -65,9 +65,11 @@ dependencies {
 	// Numismatic Overhaul et dépendences
 	modImplementation "io.wispforest:owo-lib:0.12.15.1+1.21"
 	modImplementation "com.glisco:numismatic-overhaul:0.2.15+1.21"
-	modImplementation "curse.maven:fabric-waystones-410902:5798771"
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:6.1.0")
 	modImplementation include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:6.1.0")
+
+	// Helper for rendering Numismatic balance
+	modImplementation "com.example:NumismaticUtils:1.0.0"
 }
 
 processResources {
