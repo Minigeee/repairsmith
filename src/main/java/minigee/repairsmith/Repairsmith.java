@@ -16,6 +16,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.village.TradeOffer;
+import net.minecraft.village.TradedItem;
 import net.minecraft.village.VillagerProfession;
 import net.minecraft.world.poi.PointOfInterestType;
 
@@ -36,7 +37,7 @@ public class Repairsmith implements ModInitializer {
 
 	/** Poi registry key */
 	public static final RegistryKey<PointOfInterestType> REPAIRSMITH_POI_KEY = RegistryKey
-			.of(RegistryKeys.POINT_OF_INTEREST_TYPE, new Identifier(MOD_ID, "repairsmith_poi"));
+			.of(RegistryKeys.POINT_OF_INTEREST_TYPE, Identifier.of(MOD_ID, "repairsmith_poi"));
 	/** Repairsmith profession */
 	public static final VillagerProfession REPAIRSMITH = new VillagerProfession("repairsmith",
 			entry -> entry.matchesKey(REPAIRSMITH_POI_KEY), entry -> entry.matchesKey(REPAIRSMITH_POI_KEY),
@@ -55,17 +56,17 @@ public class Repairsmith implements ModInitializer {
 		StructurePoolAPI.injectAll(Config.STRUCTURES);
 
 		// Villager
-		PointOfInterestHelper.register(new Identifier(MOD_ID, "repairsmith_poi"), 1, 1, Blocks.ANVIL,
+		PointOfInterestHelper.register(Identifier.of(MOD_ID, "repairsmith_poi"), 1, 1, Blocks.ANVIL,
 				Blocks.CHIPPED_ANVIL, Blocks.DAMAGED_ANVIL);
-		Registry.register(Registries.VILLAGER_PROFESSION, new Identifier(MOD_ID, "repairsmith"), REPAIRSMITH);
+		Registry.register(Registries.VILLAGER_PROFESSION, Identifier.of(MOD_ID, "repairsmith"), REPAIRSMITH);
 
 		// Screen handler
-		Registry.register(Registries.SCREEN_HANDLER, new Identifier(MOD_ID, "repairsmith"), REPAIR_SCREEN_HANDLER);
+		Registry.register(Registries.SCREEN_HANDLER, Identifier.of(MOD_ID, "repairsmith"), REPAIR_SCREEN_HANDLER);
 
 		// Dummy offer so that repairsmith has something to offer
 		TradeOfferHelper.registerVillagerOffers(REPAIRSMITH, 1, (factories) -> {
-			factories.add((entity, random) -> new TradeOffer(new ItemStack(Blocks.STONE, 100),
-					new ItemStack(Blocks.STONE, 100),
+			factories.add((entity, random) -> new TradeOffer(new TradedItem(Blocks.STONE, 1),
+					new ItemStack(Blocks.STONE, 1),
 					CONFIG.maxOffers(), 1, 0.1f));
 		});
 

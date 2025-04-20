@@ -163,7 +163,7 @@ public class RepairScreenHandler extends ScreenHandler {
 
 		// Reset all damage
 		int damageRepaired = 0;
-		for (final var stack : this.inventory.stacks) {
+		for (final var stack : this.inventory.heldStacks) {
 			damageRepaired += stack.getDamage();
 			stack.setDamage(0);
 		}
@@ -192,7 +192,7 @@ public class RepairScreenHandler extends ScreenHandler {
 		}
 
 		// Play sound
-		this.playerInv.player.playSound(SoundEvents.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1.0f, 1.0f);
+		this.playerInv.player.playSound(SoundEvents.BLOCK_ANVIL_USE);
 
 		// Use special price as a field to transmit durability repaired
 		var offer = this.merchant.getOffers().get(0);

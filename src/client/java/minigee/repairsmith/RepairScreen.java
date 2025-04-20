@@ -3,6 +3,7 @@ package minigee.repairsmith;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import io.netty.buffer.Unpooled;
+import minigee.repairsmith.network.RepairItemsPacketPayload;
 import minigee.repairsmith.screen.RepairScreenHandler;
 import minigee.repairsmith.util.InventoryUtil;
 import minigee.repairsmith.util.NetworkUtil;
@@ -23,8 +24,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 public class RepairScreen extends HandledScreen<RepairScreenHandler> {
-	private static final Identifier GUI_TEXTURE = new Identifier(Repairsmith.MOD_ID, "textures/gui/repairsmith.png");
-	private static final Identifier ICONS_TEXTURE = new Identifier(Repairsmith.MOD_ID, "textures/gui/icons.png");
+	private static final Identifier GUI_TEXTURE = Identifier.of(Repairsmith.MOD_ID, "textures/gui/repairsmith.png");
+	private static final Identifier ICONS_TEXTURE = Identifier.of(Repairsmith.MOD_ID, "textures/gui/icons.png");
 
 	protected static final Text COST_TEXT = Text.translatable("text.repairsmith.cost");
     private static final Text SEPARATOR_TEXT = Text.literal(" - ");
@@ -68,7 +69,7 @@ public class RepairScreen extends HandledScreen<RepairScreenHandler> {
 
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-		renderBackground(context);
+		renderBackground(context, mouseX, mouseY, delta);
 
 		// Update repair btn status
 		this.repairButton.active = this.handler.getRepairCost() > 0 && this.handler.hasMoreOffers();
@@ -102,14 +103,13 @@ public class RepairScreen extends HandledScreen<RepairScreenHandler> {
 		titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
 
 		this.repairButton = this.addDrawableChild(new RepairButton(this.x + REPAIR_BTN_X, this.y + REPAIR_BTN_Y,
-				Text.translatable("text.repairsmith.repair"), (button) -> {
-					if (!button.active)
-						return;
+			Text.translatable("text.repairsmith.repair"), (button) -> {
+				if (!button.active)
+					return;
 
-					PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-					buf.writeVarInt(this.handler.syncId);
-					ClientPlayNetworking.send(NetworkUtil.REPAIR_ITEMS_PACKET, buf);
-				}));
+				RepairItemsPacketPayload repairPacket = new RepairItemsPacketPayload(this.handler.syncId);
+				ClientPlayNetworking.send(repairPacket);
+			}));
 	}
 
 	public class RepairButton extends ButtonWidget {
@@ -118,7 +118,7 @@ public class RepairScreen extends HandledScreen<RepairScreenHandler> {
 		}
 
 		@Override
-		public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+		public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
 			int v = 18;
 			if (!this.active)
 				v = 0;
