@@ -1,5 +1,6 @@
 package minigee.repairsmith;
 
+import com.glisco.numismaticoverhaul.ModComponents;
 import com.glisco.numismaticoverhaul.item.NumismaticOverhaulItems;
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -8,6 +9,7 @@ import minigee.repairsmith.network.RepairItemsPacketPayload;
 import minigee.repairsmith.screen.RepairScreenHandler;
 import minigee.repairsmith.util.InventoryUtil;
 import minigee.repairsmith.util.NetworkUtil;
+import minigee.repairsmith.util.NumismaticUtils;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -71,40 +73,91 @@ public class RepairScreen extends HandledScreen<RepairScreenHandler> {
 				this.y + REPAIR_BTN_Y - 11, 0x404040, false);
 
 		// Cost
+		var colorCostDigits = canAfford ? 0xFFFFFF : 0xE06666;
 		int cost = this.handler.getRepairCost();
 		if (cost > 0) {
-			int goldCost = cost / 10000;
-			int silverCost = (cost % 10000) / 100;
-			int bronzeCost = cost % 100;
+			int costDigitsHorizontalOffset = 5;
+			int costDigitsVerticalOffset = 9;
+			NumismaticUtils.CoinsTuple coins = NumismaticUtils.convertCostToCoins(cost);
 			context.drawText(this.textRenderer, COST_TEXT, this.x + COST_X, this.y + COST_Y, 0x404040, false);
 			int offset = 0;
-			if (goldCost > 0) {
-				ItemStack goldStack = new ItemStack(NumismaticOverhaulItems.GOLD_COIN, goldCost);
+			if (coins.goldCoins > 0) {
+				ItemStack goldStack = new ItemStack(NumismaticOverhaulItems.GOLD_COIN, (int) coins.goldCoins);
 				context.drawItem(goldStack, this.x + COST_X, this.y + COST_Y + 8);
-				context.drawItemInSlot(this.textRenderer, goldStack, this.x + COST_X,this.y + COST_Y + 8);
-				offset += 16;
+				context.getMatrices().push();
+				context.getMatrices().translate(0.0, 0.0, 200.0);
+				context.drawText(this.textRenderer, Text.literal(Long.toString(coins.goldCoins)), this.x + COST_X + costDigitsHorizontalOffset, this.y + COST_Y + costDigitsVerticalOffset + 8, colorCostDigits, true);
+				context.getMatrices().pop();
+				offset += 22;
 			}
-			if (silverCost > 0) {
-				ItemStack silverStack = new ItemStack(NumismaticOverhaulItems.SILVER_COIN, silverCost);
+			if (coins.silverCoins > 0) {
+				ItemStack silverStack = new ItemStack(NumismaticOverhaulItems.SILVER_COIN, (int) coins.silverCoins);
 				context.drawItem(silverStack, this.x + COST_X + offset, this.y + COST_Y + 8);
-				context.drawItemInSlot(this.textRenderer, silverStack, this.x + COST_X + offset,this.y + COST_Y + 8);
-				offset += 16;
+				context.getMatrices().push();
+				context.getMatrices().translate(0.0, 0.0, 200.0);
+				context.drawText(this.textRenderer, Text.literal(Long.toString(coins.silverCoins)), this.x + COST_X + costDigitsHorizontalOffset + offset, this.y + COST_Y + costDigitsVerticalOffset + 8, colorCostDigits, true);
+				context.getMatrices().pop();
+				offset += 22;
 			}
-			if (bronzeCost > 0) {
-				ItemStack bronzeStack = new ItemStack(NumismaticOverhaulItems.BRONZE_COIN, bronzeCost);
+			if (coins.bronzeCoins > 0) {
+				ItemStack bronzeStack = new ItemStack(NumismaticOverhaulItems.BRONZE_COIN, (int) coins.bronzeCoins);
 				context.drawItem(bronzeStack, this.x + COST_X + offset, this.y + COST_Y + 8);
-				context.drawItemInSlot(this.textRenderer, bronzeStack, this.x + COST_X + offset,this.y + COST_Y + 8);
+				context.getMatrices().push();
+				context.getMatrices().translate(0.0, 0.0, 200.0);
+				context.drawText(this.textRenderer, Text.literal(Long.toString(coins.bronzeCoins)), this.x + COST_X + costDigitsHorizontalOffset + offset, this.y + COST_Y + costDigitsVerticalOffset + 8, colorCostDigits, true);
+				context.getMatrices().pop();
 			}
 		}
 
+		renderNumismaticBalance(context, this.x + 117, this.y + 5);
+
 		drawMouseoverTooltip(context, mouseX, mouseY);
+
+		renderBalanceTooltip(context, mouseX, mouseY);
+	}
+
+	protected void renderNumismaticBalance(DrawContext context, int x, int y) {
+		int costDigitsHorizontalOffset = 5;
+		int costDigitsVerticalOffset = 9;
+		long balance = ModComponents.CURRENCY.get(client.player).getValue();
+		NumismaticUtils.CoinsTuple coins = NumismaticUtils.convertCostToCoins(balance);
+		if (coins.goldCoins > 0) {
+			ItemStack goldStack = new ItemStack(NumismaticOverhaulItems.GOLD_COIN, (int) coins.goldCoins);
+			context.drawItem(goldStack, x, y);
+			context.getMatrices().push();
+			context.getMatrices().translate(0.0, 0.0, 200.0);
+			context.drawText(this.textRenderer, Text.literal(Long.toString(coins.goldCoins)), x + costDigitsHorizontalOffset, y + costDigitsVerticalOffset, 0xEEEEEE, false);
+			context.getMatrices().pop();
+		}
+		if (coins.silverCoins > 0) {
+			ItemStack silverStack = new ItemStack(NumismaticOverhaulItems.SILVER_COIN, (int) coins.silverCoins);
+			context.drawItem(silverStack, x + 18, y);
+			context.getMatrices().push();
+			context.getMatrices().translate(0.0, 0.0, 200.0);
+			context.drawText(this.textRenderer, Text.literal(Long.toString(coins.silverCoins)), x + costDigitsHorizontalOffset + 18, y + costDigitsVerticalOffset, 0xEEEEEE, false);
+			context.getMatrices().pop();
+		}
+		if (coins.bronzeCoins > 0) {
+			ItemStack bronzeStack = new ItemStack(NumismaticOverhaulItems.BRONZE_COIN, (int) coins.bronzeCoins);
+			context.drawItem(bronzeStack, x + 2*18, y);
+			context.getMatrices().push();
+			context.getMatrices().translate(0.0, 0.0, 200.0);
+			context.drawText(this.textRenderer, Text.literal(Long.toString(coins.bronzeCoins)), x + costDigitsHorizontalOffset + 2*18, y + costDigitsVerticalOffset, 0xEEEEEE, false);
+			context.getMatrices().pop();
+		}
+	}
+
+	protected void renderBalanceTooltip(DrawContext context, int mouseX, int mouseY) {
+		if (mouseX >= this.x + 117 && mouseX <= this.x + 170 && mouseY >= this.y + 5 && mouseY <= this.y + 22) {
+			context.drawTooltip(textRenderer, Text.translatable("numismatic.current_balance"), mouseX, mouseY);
+		}
 	}
 
 	@Override
 	protected void init() {
 		super.init();
 
-		titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
+		titleX = 3 + (114 - textRenderer.getWidth(title)) / 2;
 
 		this.repairButton = this.addDrawableChild(new RepairButton(this.x + REPAIR_BTN_X, this.y + REPAIR_BTN_Y,
 			Text.translatable("text.repairsmith.repair"), (button) -> {
