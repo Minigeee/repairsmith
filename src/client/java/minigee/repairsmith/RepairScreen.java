@@ -76,40 +76,43 @@ public class RepairScreen extends HandledScreen<RepairScreenHandler> {
 		var colorCostDigits = canAfford ? 0xFFFFFF : 0xE06666;
 		int cost = this.handler.getRepairCost();
 		if (cost > 0) {
-			int costDigitsHorizontalOffset = 5;
+			int costDigitsHorizontalOffset = 11;
 			int costDigitsVerticalOffset = 9;
 			NumismaticUtils.CoinsTuple coins = NumismaticUtils.convertCostToCoins(cost);
 			context.drawText(this.textRenderer, COST_TEXT, this.x + COST_X, this.y + COST_Y, 0x404040, false);
 			int offset = 0;
 			if (coins.goldCoins > 0) {
+				int goldShift = coins.goldCoins >= 1000 ? 3 : coins.goldCoins >= 100 ? 2 : coins.goldCoins >= 10 ? 1 : 0;
 				ItemStack goldStack = new ItemStack(NumismaticOverhaulItems.GOLD_COIN, (int) coins.goldCoins);
 				context.drawItem(goldStack, this.x + COST_X, this.y + COST_Y + 8);
 				context.getMatrices().push();
 				context.getMatrices().translate(0.0, 0.0, 200.0);
-				context.drawText(this.textRenderer, Text.literal(Long.toString(coins.goldCoins)), this.x + COST_X + costDigitsHorizontalOffset, this.y + COST_Y + costDigitsVerticalOffset + 8, colorCostDigits, true);
+				context.drawText(this.textRenderer, Text.literal(Long.toString(coins.goldCoins)), this.x + COST_X + costDigitsHorizontalOffset - goldShift*6, this.y + COST_Y + costDigitsVerticalOffset + 8, colorCostDigits, true);
 				context.getMatrices().pop();
-				offset += 22;
+				offset += 16;
 			}
 			if (coins.silverCoins > 0) {
+				int silverShift = coins.silverCoins >= 10 ? 1 : 0;
 				ItemStack silverStack = new ItemStack(NumismaticOverhaulItems.SILVER_COIN, (int) coins.silverCoins);
 				context.drawItem(silverStack, this.x + COST_X + offset, this.y + COST_Y + 8);
 				context.getMatrices().push();
 				context.getMatrices().translate(0.0, 0.0, 200.0);
-				context.drawText(this.textRenderer, Text.literal(Long.toString(coins.silverCoins)), this.x + COST_X + costDigitsHorizontalOffset + offset, this.y + COST_Y + costDigitsVerticalOffset + 8, colorCostDigits, true);
+				context.drawText(this.textRenderer, Text.literal(Long.toString(coins.silverCoins)), this.x + COST_X + costDigitsHorizontalOffset + offset - silverShift*6, this.y + COST_Y + costDigitsVerticalOffset + 8, colorCostDigits, true);
 				context.getMatrices().pop();
-				offset += 22;
+				offset += 16;
 			}
 			if (coins.bronzeCoins > 0) {
+				int bronzeShift = coins.bronzeCoins >= 10 ? 1 : 0;
 				ItemStack bronzeStack = new ItemStack(NumismaticOverhaulItems.BRONZE_COIN, (int) coins.bronzeCoins);
 				context.drawItem(bronzeStack, this.x + COST_X + offset, this.y + COST_Y + 8);
 				context.getMatrices().push();
 				context.getMatrices().translate(0.0, 0.0, 200.0);
-				context.drawText(this.textRenderer, Text.literal(Long.toString(coins.bronzeCoins)), this.x + COST_X + costDigitsHorizontalOffset + offset, this.y + COST_Y + costDigitsVerticalOffset + 8, colorCostDigits, true);
+				context.drawText(this.textRenderer, Text.literal(Long.toString(coins.bronzeCoins)), this.x + COST_X + costDigitsHorizontalOffset + offset - bronzeShift*6, this.y + COST_Y + costDigitsVerticalOffset + 8, colorCostDigits, true);
 				context.getMatrices().pop();
 			}
 		}
 
-		renderNumismaticBalance(context, this.x + 117, this.y + 5);
+		renderNumismaticBalance(context, this.x + 121, this.y + 5);
 
 		drawMouseoverTooltip(context, mouseX, mouseY);
 
@@ -117,32 +120,35 @@ public class RepairScreen extends HandledScreen<RepairScreenHandler> {
 	}
 
 	protected void renderNumismaticBalance(DrawContext context, int x, int y) {
-		int costDigitsHorizontalOffset = 5;
+		int costDigitsHorizontalOffset = 11;
 		int costDigitsVerticalOffset = 9;
 		long balance = ModComponents.CURRENCY.get(client.player).getValue();
 		NumismaticUtils.CoinsTuple coins = NumismaticUtils.convertCostToCoins(balance);
 		if (coins.goldCoins > 0) {
+			int goldShift = coins.goldCoins >= 1000 ? 3 : coins.goldCoins >= 100 ? 2 : coins.goldCoins >= 10 ? 1 : 0;
 			ItemStack goldStack = new ItemStack(NumismaticOverhaulItems.GOLD_COIN, (int) coins.goldCoins);
 			context.drawItem(goldStack, x, y);
 			context.getMatrices().push();
 			context.getMatrices().translate(0.0, 0.0, 200.0);
-			context.drawText(this.textRenderer, Text.literal(Long.toString(coins.goldCoins)), x + costDigitsHorizontalOffset, y + costDigitsVerticalOffset, 0xEEEEEE, false);
+			context.drawText(this.textRenderer, Text.literal(Long.toString(coins.goldCoins)), x + costDigitsHorizontalOffset - goldShift*6, y + costDigitsVerticalOffset, 0xEEEEEE, false);
 			context.getMatrices().pop();
 		}
 		if (coins.silverCoins > 0) {
+			int silverShift = coins.silverCoins >= 10 ? 1 : 0;
 			ItemStack silverStack = new ItemStack(NumismaticOverhaulItems.SILVER_COIN, (int) coins.silverCoins);
-			context.drawItem(silverStack, x + 18, y);
+			context.drawItem(silverStack, x + 16, y);
 			context.getMatrices().push();
 			context.getMatrices().translate(0.0, 0.0, 200.0);
-			context.drawText(this.textRenderer, Text.literal(Long.toString(coins.silverCoins)), x + costDigitsHorizontalOffset + 18, y + costDigitsVerticalOffset, 0xEEEEEE, false);
+			context.drawText(this.textRenderer, Text.literal(Long.toString(coins.silverCoins)), x + costDigitsHorizontalOffset + 16 - silverShift*6 , y + costDigitsVerticalOffset, 0xEEEEEE, false);
 			context.getMatrices().pop();
 		}
 		if (coins.bronzeCoins > 0) {
+			int bronzeShift = coins.bronzeCoins >= 10 ? 1 : 0;
 			ItemStack bronzeStack = new ItemStack(NumismaticOverhaulItems.BRONZE_COIN, (int) coins.bronzeCoins);
-			context.drawItem(bronzeStack, x + 2*18, y);
+			context.drawItem(bronzeStack, x + 2*16, y);
 			context.getMatrices().push();
 			context.getMatrices().translate(0.0, 0.0, 200.0);
-			context.drawText(this.textRenderer, Text.literal(Long.toString(coins.bronzeCoins)), x + costDigitsHorizontalOffset + 2*18, y + costDigitsVerticalOffset, 0xEEEEEE, false);
+			context.drawText(this.textRenderer, Text.literal(Long.toString(coins.bronzeCoins)), x + costDigitsHorizontalOffset + 2*16 - bronzeShift*6, y + costDigitsVerticalOffset, 0xEEEEEE, false);
 			context.getMatrices().pop();
 		}
 	}
